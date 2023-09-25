@@ -22,8 +22,6 @@ help: logo ## get a list of all the targets, and their short descriptions
 	@# source for the incantation: https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' Makefile | awk 'BEGIN {FS = ":.*?##"}; {printf "\033[1;38;5;214m%-12s\033[0m %s\n", $$1, $$2}'
 
-# it-all: logo ## runs automated deployment steps
-
 environment: ## installs required environment for deployment and corpus generation
 	@if [ -z "$(ENV_LOADED)" ]; then \
 			echo "Error: Configuration file not found" >&2; \
@@ -33,10 +31,10 @@ environment: ## installs required environment for deployment and corpus generati
 	fi
 	python -m pip install -qqq -r requirements.txt
 
-run-etls: ## runs our etls to load data into our db
+run-etls: environment ## runs our etls to load data into our db
 	python etl/youtube.py
 
-vector-db: ## creates / updates the vector embeddings for the data
+vector-db: environment ## creates / updates the vector embeddings for the data
 	python vector-db.py
 
 logo:  ## prints the logo
