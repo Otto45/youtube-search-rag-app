@@ -35,7 +35,10 @@ run-etls: environment ## runs our etls to load data into our db
 	python etl/youtube.py
 
 vector-db: environment ## creates / updates the vector embeddings for the data
-	python vector-db.py
+	python vectordb.py
+
+cli-query: environment
+	python app.py
 
 logo:  ## prints the logo
 	@cat logo.txt; echo "\n"

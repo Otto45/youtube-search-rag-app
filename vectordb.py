@@ -1,10 +1,6 @@
 import json
 from pathlib import Path
 
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.vectorstores import FAISS
-
 VECTOR_DB_DIR = "local-vector-db"
 VECTOR_EMBEDDINGS_INDEX_NAME = "local-index"
 
@@ -15,9 +11,13 @@ def get_documents():
     return documents
 
 def get_embedding_engine(model="text-embedding-ada-002", **kwargs):
+    from langchain.embeddings import OpenAIEmbeddings
+
     return OpenAIEmbeddings(model=model, **kwargs)
 
 def prep_documents_for_vector_storage(documents):
+    from langchain.text_splitter import RecursiveCharacterTextSplitter
+    
     text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
         chunk_size=500, chunk_overlap=100, allowed_special="all"
     )
@@ -34,6 +34,8 @@ def prep_documents_for_vector_storage(documents):
     return text_chunks, metadatas
 
 def create_and_save_vector_embeddings():
+    from langchain import FAISS
+
     documents = get_documents()
     text_chunks, metadatas = prep_documents_for_vector_storage(documents)
 
@@ -50,6 +52,13 @@ def create_and_save_vector_embeddings():
 
     index.save_local(folder_path=VECTOR_DB_DIR, index_name=VECTOR_EMBEDDINGS_INDEX_NAME)
 
+
+def get_vector_index():
+    from langchain.vectorstores import FAISS
+
+    vector_index = FAISS.load_local(VECTOR_DB_DIR, get_embedding_engine(), VECTOR_EMBEDDINGS_INDEX_NAME)
+
+    return vector_index
 
 # For now just store the vector embeddings locally
 Path("local-vector-db").mkdir(exist_ok=True)
