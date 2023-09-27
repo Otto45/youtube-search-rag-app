@@ -1,6 +1,8 @@
 faiss-cpu~=1.7.4
 langchain==0.0.298
 openai~=0.28.0
+pymongo~=4.5.0
 python-dotenv==1.0.0
 tiktoken==0.5.1
+youtube3~=1.2.5
 youtube-transcript-api==0.6.1
