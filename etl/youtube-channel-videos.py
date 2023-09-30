@@ -157,6 +157,8 @@ process_videos = True
 while (process_videos):
     video_info_with_transcripts = []
 
+    # TODO: Process each video in parallel to speed things up
+    # TODO: Use AWS Step Functions to coordinate getting videos for channel and lambda to process each video
     for video_id_with_title in video_ids_with_titles:
         video_id = video_id_with_title["id"]
         video_title = video_id_with_title["title"]
