@@ -32,10 +32,7 @@ environment: ## installs required environment for deployment and corpus generati
 	python -m pip install -qqq -r requirements.txt
 
 run-etls: environment ## runs our etls to load data into our db
-	python etl/youtube.py -c "UC1PhnlVt1hE1UrmOsZwblig"
-
-vector-db: environment ## creates / updates the vector embeddings for the data
-	python vectordb.py
+	python etl/youtube-channel-videos.py -c "UC1PhnlVt1hE1UrmOsZwblig"
 
 cli-query: environment
 	python app.py
