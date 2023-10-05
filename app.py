@@ -1,18 +1,36 @@
+import os
 import prompts
-import vectordb
 
 from langchain.chat_models import ChatOpenAI
 from langchain.chains.qa_with_sources import load_qa_with_sources_chain
+from langchain.embeddings import BedrockEmbeddings
+from langchain.vectorstores import MongoDBAtlasVectorSearch
+from pymongo import MongoClient
 
-user_prompt = input("Prompt:")
+def get_embeddings():
+    return BedrockEmbeddings()
 
-embedding_engine = vectordb.get_embedding_engine(allowed_special="all")
-vector_index = vectordb.get_vector_index()
+def get_vector_store():
+    client = MongoClient(os.environ["MONGODB_ATLAS_CLUSTER_URI"])
 
-sources_and_scores = vector_index.similarity_search_with_score(user_prompt, k=3)
-sources, scores = zip(*sources_and_scores)
+    db_name = "youtube_ai_search"
+    collection_name = "video_transcripts"
+    collection = client[db_name][collection_name]
+    index_name = "video_transcripts_embeddings_index"
+    embeddings = get_embeddings()
 
+    return MongoDBAtlasVectorSearch(
+        collection, embeddings, index_name=index_name
+    )
+
+# Main
+
+user_prompt = input("Prompt: ")
+
+vector_store = get_vector_store()
+documents = vector_store.similarity_search(user_prompt)
 llm = ChatOpenAI(model_name="gpt-4", temperature=0, max_tokens=256)
+
 chain = load_qa_with_sources_chain(
     llm,
     chain_type="stuff",
@@ -22,7 +40,7 @@ chain = load_qa_with_sources_chain(
 )
 
 result = chain(
-    {"input_documents": sources, "question": user_prompt}, return_only_outputs=True
+    {"input_documents": documents, "question": user_prompt}, return_only_outputs=True
 )
 
 answer = result["output_text"]

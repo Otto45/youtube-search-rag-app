@@ -136,7 +136,7 @@ def save_documents_with_vector_embeddings(documents):
     db_name = "youtube_ai_search"
     collection_name = "video_transcripts"
     collection = client[db_name][collection_name]
-    index_name = "video_transcripts"
+    index_name = "video_transcripts_embeddings_index"
     embeddings = get_embeddings()
 
     text_chunks, metadatas = prep_documents_for_vector_storage(documents)
@@ -148,6 +148,8 @@ def save_documents_with_vector_embeddings(documents):
 argParser = argparse.ArgumentParser()
 argParser.add_argument("-c", "--channel")
 
+# TODO: Look into the source code for the langchain youtube loader, we may be able to use
+# the channel name to start
 args = argParser.parse_args()
 youtube_channel_id = args.channel
 
