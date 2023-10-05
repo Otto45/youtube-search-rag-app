@@ -32,7 +32,7 @@ def get_videos_for_user(channel_id: string, next_page_token: string = None):
     request = youtube.playlistItems().list(
         playlistId=uploads_playlist_id,
         part="snippet",
-        maxResults=25, # 50 is the max allowed per page of results
+        maxResults=5, # 50 is the max allowed per page of results
         pageToken=next_page_token
     )
 
@@ -75,14 +75,14 @@ def get_video_chapters(video_id: string):
     
     return chapters
 
-def add_transcript_to_chapters(chapters, subtitles):
+def add_transcript_to_chapters(chapters, transcript):
     for ii, chapter in enumerate(chapters):
         next_chapter = chapters[ii + 1] if ii < len(chapters) - 1 else {"time": 1e10}
 
         text = " ".join(
             [
                 seg["text"]
-                for seg in subtitles
+                for seg in transcript
                 if seg["start"] >= chapter["time"]
                 and seg["start"] < next_chapter["time"]
             ]
@@ -93,11 +93,13 @@ def add_transcript_to_chapters(chapters, subtitles):
     return chapters
 
 def create_documents(video_info_with_transcripts):
-    base_url = f"https://www.youtube.com/watch?v={video_id}"
-    query_params_format = "&t={start}s"
     documents = []
     
     for video_info in video_info_with_transcripts:
+        video_id = video_info["id"]
+        base_url = f"https://www.youtube.com/watch?v={video_id}"
+        query_params_format = "&t={start}s"
+
         for chapter in video_info["chapters"]:
             text = chapter["text"]
             start = chapter["time"]
